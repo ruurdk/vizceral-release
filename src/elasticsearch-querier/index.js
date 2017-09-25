@@ -43,6 +43,7 @@ app.get('/query-elasticsearch', function (req, res) {
     nodes = [{
         name: 'INTERNET' // Required... this is the entry node
     }];
+    connections = [];
 
     requestsByNode = getRequestsByNode(elastic_ip);
     tagsWithIPs = getTagsWithIPs(elastic_ip);
