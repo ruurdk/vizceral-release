@@ -43,7 +43,6 @@ app.get('/query-elasticsearch', function (req, res) {
     nodes = [{
         name: 'INTERNET' // Required... this is the entry node
     }];
-    connections = [];
 
     requestsByNode = getRequestsByNode(elastic_ip);
     tagsWithIPs = getTagsWithIPs(elastic_ip);
@@ -125,6 +124,11 @@ app.get('/query-elasticsearch', function (req, res) {
         }, this);
         addTagsToNodeList(nodes, ipsToTags);
 
+        // add entry connections.
+        var entryConnections = getEntryConnections();
+        entryConnections.map(function(c){
+            connections.push({ source: "INTERNET", target: c.name });
+        });
 
         vizceral_data = {
             // Which graph renderer to use for this graph (currently only 'global' and 'region')
@@ -181,6 +185,21 @@ app.get('/query-elasticsearch', function (req, res) {
 app.listen(8081, function () {
     console.log('Server started');
 });
+
+function getEntryConnections(nodes) {
+   // try to find ha proxy.
+   var haproxyNode = nodes.filter(function(n) {
+       return n.displayName != undefined && n.displayName.indexOf("haproxy") != -1;
+   });
+   if (haproxyNode.length > 0)
+       return haProxyNode;
+
+   // try to find go routers.
+   var routerNodes = nodes.filter(function(n) {
+       return n.displayName != undefined && n.displayName.indexOf("router") != -1;
+   });
+   return routerNodes;
+}
 
 function addTagsToNodeList(nodes, ipsToTags) {
     nodes.forEach(function (node) {
