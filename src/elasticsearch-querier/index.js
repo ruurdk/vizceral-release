@@ -125,7 +125,7 @@ app.get('/query-elasticsearch', function (req, res) {
         addTagsToNodeList(nodes, ipsToTags);
 
         // add entry connections.
-        var entryConnections = getEntryConnections();
+        var entryConnections = getEntryConnections(nodes);
         entryConnections.map(function(c){
             connections.push({ source: "INTERNET", target: c.name });
         });
@@ -189,10 +189,10 @@ app.listen(8081, function () {
 function getEntryConnections(nodes) {
    // try to find ha proxy.
    var haproxyNode = nodes.filter(function(n) {
-       return n.displayName != undefined && n.displayName.indexOf("haproxy") != -1;
+       return n.displayName != undefined && n.displayName.indexOf("ha_proxy") != -1;
    });
    if (haproxyNode.length > 0)
-       return haProxyNode;
+       return haproxyNode;
 
    // try to find go routers.
    var routerNodes = nodes.filter(function(n) {
